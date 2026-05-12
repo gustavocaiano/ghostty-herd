@@ -1,0 +1,26 @@
+# Herdr config snapshot.
+# Active file: ~/.config/herdr/config.toml
+
+onboarding = false
+
+[keys]
+previous_workspace = "ctrl+up"
+next_workspace = "ctrl+down"
+previous_tab = "ctrl+left"
+next_tab = "ctrl+right"
+focus_pane_left = "alt+h"
+focus_pane_down = "alt+j"
+focus_pane_up = "alt+k"
+focus_pane_right = "alt+l"
+
+[theme]
+name = "one-dark"
+
+[ui.toast]
+delivery = "terminal"
+
+[ui]
+show_agent_labels_on_pane_borders = true
+
+[ui.sound]
+enabled = true
