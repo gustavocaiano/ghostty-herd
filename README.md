@@ -46,4 +46,19 @@ Packaged copies in this folder are snapshots for reference:
 
 Separate Dock app/icon note:
 
-`herd` currently launches another instance of **Ghostty**, so macOS still shows Ghostty in the Dock. A separate **Herdr.app** icon/name is possible, but it requires creating or copying a macOS app bundle with a different bundle name/identifier and launching Ghostty with this profile from that app. That is more invasive than config changes, so do it as a separate step.
+`herd` currently launches another instance of **Ghostty**.
+
+Ghostty supports changing the macOS Dock/app-switcher icon from config:
+
+```ini
+# Built-in icon variant example
+macos-icon = holographic
+
+# Or a custom icon file
+macos-icon = custom
+macos-custom-icon = /absolute/path/to/Herdr.icns
+```
+
+This can be added to `~/.config/ghostty/herdr` so only the Herdr-launched Ghostty profile gets a different icon.
+
+Changing the app name from **Ghostty** to **Herdr** is different: Ghostty does not expose a config option for the macOS app name. For a different Dock/app name, you need a separate app bundle (`Herdr.app`) with a different bundle name/identifier.
