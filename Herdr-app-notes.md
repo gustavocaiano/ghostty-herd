@@ -24,10 +24,12 @@ or:
 ```ini
 # Use a custom icon file
 macos-icon = custom
-macos-custom-icon = /absolute/path/to/Herdr.icns
+macos-custom-icon = /Users/gustavocaiano/.config/ghostty/Herdr.icns
 ```
 
-Supported custom icon formats include PNG, JPEG, and ICNS. If `macos-custom-icon` is omitted, Ghostty defaults to `~/.config/ghostty/Ghostty.icns`.
+Put your icon file at `~/.config/ghostty/Herdr.icns` for the path above.
+
+Supported custom icon formats include PNG, JPEG, and ICNS. ICNS is recommended on macOS. If `macos-custom-icon` is omitted, Ghostty defaults to `~/.config/ghostty/Ghostty.icns`.
 
 This is the lightest way to visually distinguish the Herdr-launched Ghostty window.
 
