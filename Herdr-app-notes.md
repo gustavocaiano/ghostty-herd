@@ -12,6 +12,8 @@ This opens another Ghostty instance.
 
 Ghostty supports changing the macOS app icon via config. This affects the Dock and application switcher icon, not the Finder bundle icon.
 
+Important limitation: this is application-level for the Ghostty bundle, not per window/profile. If regular Ghostty and Herdr are both running from `Ghostty.app`, setting `macos-icon` in the Herdr profile can make all running Ghostty Dock/app-switcher icons use the same icon.
+
 Add one of these to `~/.config/ghostty/herdr`:
 
 ```ini
@@ -31,7 +33,7 @@ Put your icon file at `~/.config/ghostty/Herdr.icns` for the path above.
 
 Supported custom icon formats include PNG, JPEG, and ICNS. ICNS is recommended on macOS. If `macos-custom-icon` is omitted, Ghostty defaults to `~/.config/ghostty/Ghostty.icns`.
 
-This is the lightest way to visually distinguish the Herdr-launched Ghostty window.
+This is useful only if you are okay with Ghostty as an app using that icon while the config is active. It is not a reliable way to give only the Herdr-launched window its own Dock icon.
 
 ## Name option
 
