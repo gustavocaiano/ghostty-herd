@@ -44,7 +44,7 @@ Criar app separada:
 Abrir:
 
 ```bash
-open -na "$HOME/Applications/Herdr.app"
+open "$HOME/Applications/Herdr.app"
 ```
 
 Esta é a opção recomendada para shortcuts como `Ctrl+3`, porque macOS vê `Herdr.app` como app separada.

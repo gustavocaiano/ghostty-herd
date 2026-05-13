@@ -13,7 +13,7 @@ Configuração para usar **Herdr dentro do Ghostty** com atalhos estilo cmux/mac
 2. Abrir a app:
 
    ```bash
-   open -na "$HOME/Applications/Herdr.app"
+   open "$HOME/Applications/Herdr.app"
    ```
 
 3. Apontar o teu shortcut, por exemplo `Ctrl+3`, para:
@@ -61,7 +61,14 @@ Adiciona isto ao `~/.zshrc`:
 
 ```zsh
 herd() {
-  open -na "$HOME/Applications/Herdr.app"
+  local app="$HOME/Applications/Herdr.app"
+  local bundle_id="com.gustavocaiano.herdr"
+
+  if pgrep -f "$app/Contents/MacOS/(herdr-launcher|ghostty-bin)" >/dev/null 2>&1; then
+    osascript -e "tell application id \"$bundle_id\" to activate" >/dev/null 2>&1 || open "$app"
+  else
+    open "$app"
+  fi
 }
 ```
 
@@ -83,7 +90,7 @@ Para ter nome/ícone separados no Dock e apontar shortcuts diretamente para a ap
 Depois abre:
 
 ```bash
-open -na "$HOME/Applications/Herdr.app"
+open "$HOME/Applications/Herdr.app"
 ```
 
 Esta app é uma cópia local de `Ghostty.app` com:

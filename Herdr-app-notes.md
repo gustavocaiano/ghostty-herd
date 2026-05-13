@@ -11,7 +11,7 @@ This opens another Ghostty instance.
 Recommended launcher when `Herdr.app` exists:
 
 ```zsh
-open -na "$HOME/Applications/Herdr.app"
+open "$HOME/Applications/Herdr.app"
 ```
 
 ## Icon-only option

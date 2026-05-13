@@ -26,7 +26,7 @@ Recria a app:
 Depois abre diretamente:
 
 ```bash
-open -na "$HOME/Applications/Herdr.app"
+open "$HOME/Applications/Herdr.app"
 ```
 
 Se vires `RBSRequestErrorDomain Code=5` / `Launchd job spawn failed`, recria com a versão atual dos scripts. Versões antigas usavam um shell script como `CFBundleExecutable`; a versão atual usa um launcher nativo compilado, que é mais compatível com LaunchServices.
