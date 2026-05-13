@@ -4,7 +4,7 @@
 
 `macos-icon` é app-wide para o bundle Ghostty. Não é por janela/profile. Remove `macos-icon` do profile se não quiseres esse comportamento, ou usa `Herdr.app` separada.
 
-## `Cmd+↑` fica preso no UI `ctrl+b`
+## `Ctrl+Cmd+↑` fica preso no UI `ctrl+b`
 
 Não uses `ctrl+b + arrow` para navegação persistente; Herdr mantém o navigate mode ativo. A config deste repo usa bindings diretos:
 
@@ -13,7 +13,7 @@ previous_workspace = "ctrl+up"
 next_workspace = "ctrl+down"
 ```
 
-e Ghostty traduz `Cmd+↑/↓` para `Ctrl+↑/↓`.
+e Ghostty traduz `Ctrl+Cmd+↑/↓` para `Ctrl+↑/↓`.
 
 ## `Herdr.app` não abre Herdr
 
@@ -28,6 +28,18 @@ Depois abre diretamente:
 ```bash
 open -na "$HOME/Applications/Herdr.app"
 ```
+
+Se vires `RBSRequestErrorDomain Code=5` / `Launchd job spawn failed`, recria com a versão atual dos scripts. Versões antigas usavam um shell script como `CFBundleExecutable`; a versão atual usa um launcher nativo compilado, que é mais compatível com LaunchServices.
+
+## `nested herdr is disabled by default`
+
+Isto acontece quando lanças `Herdr.app` a partir de dentro de um pane Herdr e o ambiente herda `HERDR_ENV=1`. Recria a app com a versão atual dos scripts:
+
+```bash
+~/.config/herd/scripts/create-herdr-app.sh
+```
+
+O launcher nativo atual limpa `HERDR_ENV`, `HERDR_SOCKET_PATH` e variáveis `HERDR_ACTIVE_*` antes de iniciar Ghostty/Herdr.
 
 ## macOS diz que a app não é verificada
 

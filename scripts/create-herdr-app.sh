@@ -10,6 +10,7 @@ ICON_PATH="${ICON_PATH:-$REPO_DIR/assets/herdr.icns}"
 GHOSTTY_PROFILE="${GHOSTTY_PROFILE:-$HOME/.config/ghostty/herdr}"
 HERDR_BIN="${HERDR_BIN:-$HOME/.local/bin/herdr}"
 FORCE="${FORCE:-0}"
+CLANG="${CLANG:-/usr/bin/clang}"
 
 log() { printf '[create-herdr-app] %s\n' "$*"; }
 die() { printf '[create-herdr-app] error: %s\n' "$*" >&2; exit 1; }
@@ -19,6 +20,7 @@ die() { printf '[create-herdr-app] error: %s\n' "$*" >&2; exit 1; }
 [[ -f "$ICON_PATH" ]] || die "icon not found: $ICON_PATH"
 [[ -f "$GHOSTTY_PROFILE" ]] || die "Ghostty Herdr profile not found: $GHOSTTY_PROFILE"
 [[ -x "$HERDR_BIN" ]] || die "herdr binary not executable: $HERDR_BIN"
+[[ -x "$CLANG" ]] || die "clang not found: $CLANG; install Xcode Command Line Tools"
 
 if [[ -d "$TARGET_APP" ]] && pgrep -f "$TARGET_APP/Contents/MacOS/(herdr-launcher|ghostty-bin|ghostty)" >/dev/null 2>&1; then
   if [[ "$FORCE" != "1" ]]; then
@@ -48,16 +50,115 @@ log "patching Info.plist"
 log "installing icon"
 cp "$ICON_PATH" "$RESOURCES/$APP_NAME.icns"
 
-log "installing launcher wrapper"
+log "installing native launcher"
 mv "$ORIGINAL_BIN" "$RENAMED_BIN"
-cat > "$LAUNCHER" <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-exec "\$(cd "\$(dirname "\$0")" && pwd)/ghostty-bin" \\
-  --config-file="$GHOSTTY_PROFILE" \\
-  --command="$HERDR_BIN" \\
-  "\$@"
+launcher_src="$(mktemp /tmp/herdr-launcher.XXXXXX.c)"
+cat > "$launcher_src" <<'EOF'
+#include <errno.h>
+#include <limits.h>
+#include <mach-o/dyld.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+static char *join2(const char *a, const char *b) {
+  size_t len = strlen(a) + strlen(b) + 1;
+  char *out = (char *)calloc(len, 1);
+  if (!out) return NULL;
+  snprintf(out, len, "%s%s", a, b);
+  return out;
+}
+
+static char *arg_with_value(const char *key, const char *value) {
+  size_t len = strlen(key) + strlen(value) + 1;
+  char *out = (char *)calloc(len, 1);
+  if (!out) return NULL;
+  snprintf(out, len, "%s%s", key, value);
+  return out;
+}
+
+int main(int argc, char **argv) {
+  // If Herdr.app is launched from inside an existing Herdr pane, LaunchServices
+  // may preserve HERDR_* environment variables. Clear them so the new app
+  // attaches normally instead of being rejected as a nested Herdr instance.
+  unsetenv("HERDR_ENV");
+  unsetenv("HERDR_SOCKET_PATH");
+  unsetenv("HERDR_SESSION");
+  unsetenv("HERDR_ACTIVE_WORKSPACE_ID");
+  unsetenv("HERDR_ACTIVE_TAB_ID");
+  unsetenv("HERDR_ACTIVE_PANE_ID");
+  unsetenv("HERDR_ACTIVE_PANE_CWD");
+
+  char exe_path[PATH_MAX];
+  uint32_t exe_path_size = sizeof(exe_path);
+  if (_NSGetExecutablePath(exe_path, &exe_path_size) != 0) {
+    fprintf(stderr, "herdr-launcher: executable path is too long\n");
+    return 127;
+  }
+
+  char *last_slash = strrchr(exe_path, '/');
+  if (!last_slash) {
+    fprintf(stderr, "herdr-launcher: cannot determine executable directory\n");
+    return 127;
+  }
+  *last_slash = '\0';
+
+  char ghostty_bin[PATH_MAX];
+  snprintf(ghostty_bin, sizeof(ghostty_bin), "%s/ghostty-bin", exe_path);
+
+  const char *profile = getenv("HERDR_GHOSTTY_PROFILE");
+  const char *herdr = getenv("HERDR_BIN_PATH");
+  const char *home = getenv("HOME");
+
+  char *default_profile = NULL;
+  char *default_herdr = NULL;
+  if (!profile || profile[0] == '\0') {
+    if (!home || home[0] == '\0') {
+      fprintf(stderr, "herdr-launcher: HOME is not set and HERDR_GHOSTTY_PROFILE was not provided\n");
+      return 127;
+    }
+    default_profile = join2(home, "/.config/ghostty/herdr");
+    profile = default_profile;
+  }
+  if (!herdr || herdr[0] == '\0') {
+    if (!home || home[0] == '\0') {
+      fprintf(stderr, "herdr-launcher: HOME is not set and HERDR_BIN_PATH was not provided\n");
+      return 127;
+    }
+    default_herdr = join2(home, "/.local/bin/herdr");
+    herdr = default_herdr;
+  }
+
+  char *config_arg = arg_with_value("--config-file=", profile);
+  char *command_arg = arg_with_value("--command=", herdr);
+  if (!config_arg || !command_arg) {
+    fprintf(stderr, "herdr-launcher: out of memory\n");
+    return 127;
+  }
+
+  int extra = argc > 1 ? argc - 1 : 0;
+  char **child_argv = (char **)calloc((size_t)extra + 4, sizeof(char *));
+  if (!child_argv) {
+    fprintf(stderr, "herdr-launcher: out of memory\n");
+    return 127;
+  }
+
+  child_argv[0] = ghostty_bin;
+  child_argv[1] = config_arg;
+  child_argv[2] = command_arg;
+  for (int i = 0; i < extra; i++) child_argv[3 + i] = argv[1 + i];
+  child_argv[3 + extra] = NULL;
+
+  execv(ghostty_bin, child_argv);
+  fprintf(stderr, "herdr-launcher: execv failed for %s: %s\n", ghostty_bin, strerror(errno));
+  return 127;
+}
 EOF
+if ! "$CLANG" -Os -arch arm64 -arch x86_64 "$launcher_src" -o "$LAUNCHER" 2>/dev/null; then
+  "$CLANG" -Os "$launcher_src" -o "$LAUNCHER"
+fi
+rm -f "$launcher_src"
 chmod +x "$LAUNCHER"
 
 log "ad-hoc signing"

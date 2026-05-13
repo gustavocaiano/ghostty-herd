@@ -14,13 +14,17 @@
    - `CFBundleIconFile = Herdr`
 3. Copia `assets/herdr.icns` para `Contents/Resources/Herdr.icns`.
 4. Renomeia o binário original para `ghostty-bin`.
-5. Cria um wrapper `Contents/MacOS/herdr-launcher` que executa:
+5. Compila um launcher nativo `Contents/MacOS/herdr-launcher` que executa:
 
 ```bash
 ghostty-bin --config-file "$HOME/.config/ghostty/herdr" --command "$HOME/.local/bin/herdr"
 ```
 
 6. Assina a app localmente com `codesign --force --deep --sign -`.
+
+Nota: o launcher é compilado com `/usr/bin/clang`, por isso precisas das Xcode Command Line Tools instaladas.
+
+O launcher também limpa variáveis `HERDR_*` herdadas, para permitir abrir `Herdr.app` mesmo quando o comando é executado a partir de um pane já dentro do Herdr.
 
 ## Vantagens
 

@@ -93,7 +93,7 @@ Esta app é uma cópia local de `Ghostty.app` com:
 - bundle name/display name: `Herdr`
 - bundle id: `com.gustavocaiano.herdr`
 - ícone: `assets/herdr.icns`
-- launcher wrapper que inicia Ghostty com `--config-file ~/.config/ghostty/herdr --command ~/.local/bin/herdr`
+- launcher nativo que inicia Ghostty com `--config-file ~/.config/ghostty/herdr --command ~/.local/bin/herdr`
 - assinatura local ad-hoc (`codesign --sign -`)
 
 ## Atalhos
@@ -105,8 +105,8 @@ No profile Herdr:
 - `Cmd+D` split right
 - `Cmd+Shift+D` split down
 - `Cmd+W` fechar pane
-- `Cmd+↑/↓` workspace anterior/seguinte
-- `Cmd+←/→` tab anterior/seguinte
+- `Ctrl+Cmd+↑/↓` workspace anterior/seguinte
+- `Ctrl+Cmd+←/→` tab anterior/seguinte
 - `Ctrl+arrows` foco entre panes
 
 ## Updater diário opcional
