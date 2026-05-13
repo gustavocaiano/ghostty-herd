@@ -1,11 +1,32 @@
-# herd launcher config
+# Herd Ghostty profile
 
-Active config paths:
+Configuração para usar **Herdr dentro do Ghostty** com atalhos estilo cmux/macOS, e opcionalmente criar uma mini app `Herdr.app` separada para Dock/shortcuts.
 
-- Ghostty Herdr profile: `~/.config/ghostty/herdr`
-- Herdr config: `~/.config/herdr/config.toml`
+## O que está neste repo
 
-Add this to `~/.zshrc`:
+```text
+assets/herdr.icns                         ícone arredondado para Herdr.app
+ghostty-herdr.conf                        snapshot do profile Ghostty para Herdr
+herdr-config.toml                         snapshot das keybindings Herdr
+herd.zsh                                  função zsh simples
+scripts/create-herdr-app.sh               cria/recria ~/Applications/Herdr.app
+scripts/update-herdr-app.sh               atualiza Herdr.app quando Ghostty muda
+launchd/com.gustavocaiano.herdr-app-updater.plist
+docs/setup.md                             setup completo
+docs/herdr-app.md                         detalhes da mini app
+docs/updater.md                           updater diário via launchd
+docs/troubleshooting.md                   notas e problemas conhecidos
+```
+
+## Caminhos ativos
+
+- Ghostty profile usado pelo Herdr: `~/.config/ghostty/herdr`
+- Config Herdr: `~/.config/herdr/config.toml`
+- Mini app opcional: `~/Applications/Herdr.app`
+
+## Setup rápido: função `herd`
+
+Adiciona isto ao `~/.zshrc`:
 
 ```zsh
 herd() {
@@ -15,54 +36,66 @@ herd() {
 }
 ```
 
-Then run:
+Depois:
 
 ```zsh
 source ~/.zshrc
 herd
 ```
 
-Key behavior in the Herdr Ghostty profile:
+## Setup com app separada: `Herdr.app`
 
-- `Cmd+N` new Herdr workspace
-- `Cmd+T` new Herdr tab
-- `Cmd+D` split right
-- `Cmd+Shift+D` split down
-- `Cmd+W` close pane
-- `Cmd+↑/↓` previous/next workspace
-- `Cmd+←/→` previous/next tab
-- `Ctrl+arrows` focus panes
+Para ter nome/ícone separados no Dock e apontar shortcuts diretamente para a app:
 
-Reload notes:
-
-- After editing `~/.config/herdr/config.toml`: `herdr server reload-config`
-- After editing `~/.config/ghostty/herdr`: restart the Herdr Ghostty window
-
-Packaged copies in this folder are snapshots for reference:
-
-- `ghostty-herdr.conf`
-- `herdr-config.toml`
-- `herd.zsh`
-
-Separate Dock app/icon note:
-
-`herd` currently launches another instance of **Ghostty**.
-
-Ghostty supports changing the macOS Dock/app-switcher icon from config:
-
-```ini
-# Built-in icon variant example
-macos-icon = holographic
-
-# Or a custom icon file
-macos-icon = custom
-macos-custom-icon = /Users/gustavocaiano/.config/ghostty/Herdr.icns
+```bash
+~/.config/herd/scripts/create-herdr-app.sh
 ```
 
-Put your icon file at `~/.config/ghostty/Herdr.icns` and add the two `macos-*` lines to a Ghostty config.
+Depois abre:
 
-Supported custom icon formats: PNG, JPEG, and ICNS. ICNS is recommended on macOS.
+```bash
+open -na "$HOME/Applications/Herdr.app"
+```
 
-Important limitation: this is **not per window/profile**. On macOS the Dock icon is application-level for the Ghostty bundle. If regular Ghostty and Herdr are both running from `Ghostty.app`, setting `macos-icon` for one launched instance can make the Dock/app-switcher icon appear changed for all Ghostty instances.
+Esta app é uma cópia local de `Ghostty.app` com:
 
-For a separate Herdr-only Dock icon while normal Ghostty keeps its icon, you need a separate app bundle (`Herdr.app`) with a different bundle name/identifier. Changing the app name from **Ghostty** to **Herdr** also requires that separate app bundle.
+- bundle name/display name: `Herdr`
+- bundle id: `com.gustavocaiano.herdr`
+- ícone: `assets/herdr.icns`
+- launcher wrapper que inicia Ghostty com `--config-file ~/.config/ghostty/herdr --command ~/.local/bin/herdr`
+- assinatura local ad-hoc (`codesign --sign -`)
+
+## Atalhos
+
+No profile Herdr:
+
+- `Cmd+N` novo workspace Herdr
+- `Cmd+T` novo tab Herdr
+- `Cmd+D` split right
+- `Cmd+Shift+D` split down
+- `Cmd+W` fechar pane
+- `Cmd+↑/↓` workspace anterior/seguinte
+- `Cmd+←/→` tab anterior/seguinte
+- `Ctrl+arrows` foco entre panes
+
+## Updater diário opcional
+
+Instala o LaunchAgent:
+
+```bash
+mkdir -p "$HOME/Library/LaunchAgents"
+mkdir -p "$HOME/.config/herd/logs" "$HOME/.config/herd/state"
+cp ~/.config/herd/launchd/com.gustavocaiano.herdr-app-updater.plist "$HOME/Library/LaunchAgents/"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.gustavocaiano.herdr-app-updater.plist"
+```
+
+Ele corre diariamente e só recria `Herdr.app` se a versão de `/Applications/Ghostty.app` tiver mudado. Se `Herdr.app` estiver aberta, faz skip por segurança.
+
+## Notas importantes
+
+- `macos-icon` no Ghostty é app-wide para o bundle, não por janela/profile.
+- Para ícone separado só no Herdr, usa `Herdr.app` separada.
+- A app copiada é assinada localmente, não com a assinatura oficial da Ghostty.
+- Isto é adequado para uso local; para distribuição pública seria necessário Developer ID/notarização.
+
+Ver detalhes em `docs/setup.md`.
