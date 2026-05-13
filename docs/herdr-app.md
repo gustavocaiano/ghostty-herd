@@ -12,6 +12,7 @@
    - `CFBundleDisplayName = Herdr`
    - `CFBundleIdentifier = com.gustavocaiano.herdr`
    - `CFBundleIconFile = Herdr`
+   - remove `CFBundleIconName = Ghostty`, para o macOS não preferir o ícone antigo do asset catalog
 3. Copia `assets/herdr.icns` para `Contents/Resources/Herdr.icns`.
 4. Renomeia o binário original para `ghostty-bin`.
 5. Compila um launcher nativo `Contents/MacOS/herdr-launcher` que executa:

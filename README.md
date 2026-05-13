@@ -61,9 +61,7 @@ Adiciona isto ao `~/.zshrc`:
 
 ```zsh
 herd() {
-  open -na Ghostty --args \
-    --config-file="$HOME/.config/ghostty/herdr" \
-    --command="$HOME/.local/bin/herdr"
+  open -na "$HOME/Applications/Herdr.app"
 }
 ```
 
@@ -92,7 +90,7 @@ Esta app é uma cópia local de `Ghostty.app` com:
 
 - bundle name/display name: `Herdr`
 - bundle id: `com.gustavocaiano.herdr`
-- ícone: `assets/herdr.icns`
+- ícone: `assets/herdr.icns` via `CFBundleIconFile = Herdr` e sem `CFBundleIconName` herdado da Ghostty
 - launcher nativo que inicia Ghostty com `--config-file ~/.config/ghostty/herdr --command ~/.local/bin/herdr`
 - assinatura local ad-hoc (`codesign --sign -`)
 

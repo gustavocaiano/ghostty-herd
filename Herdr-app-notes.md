@@ -1,12 +1,18 @@
 # Herdr.app Dock icon/name options
 
-Current launcher:
+Direct Ghostty launcher:
 
 ```zsh
 open -na Ghostty --args --config-file="$HOME/.config/ghostty/herdr" --command="$HOME/.local/bin/herdr"
 ```
 
 This opens another Ghostty instance.
+
+Recommended launcher when `Herdr.app` exists:
+
+```zsh
+open -na "$HOME/Applications/Herdr.app"
+```
 
 ## Icon-only option
 

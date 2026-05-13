@@ -17,7 +17,7 @@ herdr server reload-config
 
 ## 2. Escolher modo de lançamento
 
-### Opção A — função zsh simples
+### Opção A — função zsh para `Herdr.app`
 
 Adicionar ao `~/.zshrc`:
 
@@ -31,9 +31,9 @@ Usar:
 herd
 ```
 
-Limitação: continua a ser `Ghostty.app` no Dock.
+Esta função usa `Herdr.app`, portanto requer criar a app uma vez com `scripts/create-herdr-app.sh`.
 
-### Opção B — mini app `Herdr.app`
+### Opção B — abrir a mini app `Herdr.app` diretamente
 
 Criar app separada:
 
