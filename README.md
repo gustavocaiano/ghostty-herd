@@ -2,6 +2,37 @@
 
 Configuração para usar **Herdr dentro do Ghostty** com atalhos estilo cmux/macOS, e opcionalmente criar uma mini app `Herdr.app` separada para Dock/shortcuts.
 
+## Quick activation
+
+1. Criar `Herdr.app`:
+
+   ```bash
+   ~/.config/herd/scripts/create-herdr-app.sh
+   ```
+
+2. Abrir a app:
+
+   ```bash
+   open -na "$HOME/Applications/Herdr.app"
+   ```
+
+3. Apontar o teu shortcut, por exemplo `Ctrl+3`, para:
+
+   ```text
+   ~/Applications/Herdr.app
+   ```
+
+4. Opcional: instalar o updater diário:
+
+   ```bash
+   mkdir -p "$HOME/Library/LaunchAgents"
+   mkdir -p "$HOME/.config/herd/logs" "$HOME/.config/herd/state"
+   cp ~/.config/herd/launchd/com.gustavocaiano.herdr-app-updater.plist "$HOME/Library/LaunchAgents/"
+   launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.gustavocaiano.herdr-app-updater.plist"
+   ```
+
+Nota: como `Herdr.app` é uma cópia local modificada e assinada ad-hoc, o macOS pode mostrar um aviso na primeira abertura. Para uso local isto é esperado; se bloquear, abre uma vez com botão direito → **Open** ou permite em **Privacy & Security**.
+
 ## O que está neste repo
 
 ```text
